@@ -1,0 +1,47 @@
+# docker-compose.production.yml
+
+volumes:
+  pg_data_production:
+  static_volume:
+
+# Всё отличие — заменяем build на image и указываем, какой образ использовать
+services:
+  db:
+    image: postgres:13.10
+    env_file: .env
+    volumes:
+      - pg_data_production:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    image: aleksbol2003/taski_backend_v2 # Качаем с Docker Hub
+    env_file: .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=backend.settings 
+    volumes:
+      - static_volume:/backend_static
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: aleksbol2003/taski_frontend_v2  # Качаем с Docker Hub
+    env_file: .env
+    command: cp -r /app/build/. /backend_static
+    volumes:
+      - static_volume:/backend_static
+  gateway:
+    image: aleksbol2003/taski_gateway_v2  # Качаем с Docker Hub
+    env_file: .env
+    volumes:
+      - static_volume:/backend_static
+    ports:
+      - 80:80
+    depends_on:
+      backend:
+        condition: service_started

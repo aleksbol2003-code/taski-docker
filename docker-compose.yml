@@ -1,0 +1,47 @@
+# Файл docker-compose.yml
+volumes:
+  pg_data:
+  # Новый volume — для статических файлов
+  static:
+
+services:
+  db:
+    image: postgres:13.10
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+  backend:
+    build: ./backend/
+    env_file: .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=backend.settings 
+    # Тут подключаем volume к backend
+    volumes:
+      - static:/backend_static
+#    ports:                  # <-- добавь этот блок
+#      - "8000:8000"         # хост:8000 -> контейнер:8000
+    depends_on:
+      db:
+        condition: service_healthy
+  frontend:
+    env_file: .env
+    build: ./frontend/
+#    command: cp -r /app/build/. /frontend_static/
+#    volumes:
+#      - static:/frontend_static
+
+  gateway:
+    build: ./gateway/
+    volumes:
+      - static:/backend_static
+    ports:
+      - 80:80
+    depends_on:
+      backend:
+        condition: service_started
