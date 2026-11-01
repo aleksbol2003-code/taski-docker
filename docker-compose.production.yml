@@ -19,7 +19,7 @@ services:
       start_period: 30s
 
   backend:
-    image: aleksbol2003/taski_backend_v2 # Качаем с Docker Hub
+    image: aleksbol2003/taski_backend_v3 # Качаем с Docker Hub
     env_file: .env
     environment:
       - DJANGO_SETTINGS_MODULE=backend.settings 
@@ -30,13 +30,13 @@ services:
         condition: service_healthy
 
   frontend:
-    image: aleksbol2003/taski_frontend_v2  # Качаем с Docker Hub
+    image: aleksbol2003/taski_frontend_v3  # Качаем с Docker Hub
     env_file: .env
     command: cp -r /app/build/. /backend_static
     volumes:
       - static_volume:/backend_static
   gateway:
-    image: aleksbol2003/taski_gateway_v2  # Качаем с Docker Hub
+    image: aleksbol2003/taski_gateway_v3  # Качаем с Docker Hub
     env_file: .env
     volumes:
       - static_volume:/backend_static
