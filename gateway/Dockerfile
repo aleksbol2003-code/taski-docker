@@ -6,7 +6,9 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 COPY taski-gateway.conf /etc/nginx/conf.d/taski-gateway.conf
 
 # Статика фронтенда
-COPY --from=taski-docker-frontend /app/build /usr/share/nginx/html
+
+COPY --from=aleksbol2003/taski_frontend_v3:latest /app/build /usr/share/nginx/html
+# COPY --from=taski-docker-frontend /app/build /usr/share/nginx/html - для v2
 
 
 
