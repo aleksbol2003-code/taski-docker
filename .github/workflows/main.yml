@@ -35,10 +35,10 @@ jobs:
     steps:
     # Копируем код проекта
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
     # Устанавливаем Python с помощью action
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
     # В action setup-python@v4 передаём параметр — версию Python
       with:
         python-version: 3.12
@@ -53,7 +53,6 @@ jobs:
     - name: Test with flake8 and django tests
       # Добавляем env-переменные для доступа к БД
       env:
-        POSTGRES_USER: django_user
         POSTGRES_USER: django_user
         POSTGRES_PASSWORD: <PASSWORD>
         POSTGRES_DB: django_db
